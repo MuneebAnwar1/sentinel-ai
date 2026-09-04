@@ -1,0 +1,26 @@
+[
+  {
+    "id": "ALT-001",
+    "type": "Urban Flooding",
+    "severity": "CRITICAL",
+    "location": "Karachi South",
+    "time": "Just now",
+    "ai_confidence": "94%"
+  },
+  {
+    "id": "ALT-002",
+    "type": "Heavy Rainfall",
+    "severity": "WARNING",
+    "location": "Lahore",
+    "time": "2 hours ago",
+    "ai_confidence": "88%"
+  },
+  {
+    "id": "ALT-003",
+    "type": "Infrastructure Damage",
+    "severity": "MODERATE",
+    "location": "Islamabad",
+    "time": "5 hours ago",
+    "ai_confidence": "75%"
+  }
+]

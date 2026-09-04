@@ -1,0 +1,92 @@
+.sentinel-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1a1a1a;
+  padding: 12px 24px;
+  border-bottom: 1px solid #333;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.brand-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #ff4c4c;
+}
+
+.nav-links {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-item {
+  color: #aaaaaa;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  color: #ffffff;
+  background-color: #2a2a2a;
+}
+
+.nav-item.active {
+  color: #4da6ff;
+  background-color: #1e293b;
+  font-weight: 600;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-alert-btn {
+  background-color: #ff4c4c;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.role-pill {
+  border: 1px solid;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.logout-btn {
+  background-color: transparent;
+  color: #888;
+  border: 1px solid #444;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  color: #fff;
+  border-color: #666;
+}

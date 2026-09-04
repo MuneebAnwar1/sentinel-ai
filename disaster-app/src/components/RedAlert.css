@@ -1,0 +1,74 @@
+/* Hijacks the entire viewport */
+.red-alert-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999; /* Stays on top of the map and all other UI */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  animation: bgFlash 1s infinite alternate;
+}
+
+/* The flashing background animation */
+@keyframes bgFlash {
+  0% { background-color: #ff0000; }
+  100% { background-color: #8b0000; }
+}
+
+.red-alert-content {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 40px;
+  border-radius: 12px;
+  border: 3px solid #ff4c4c;
+  max-width: 600px;
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+}
+
+.blinking-text {
+  font-size: 3rem;
+  margin-top: 0;
+  color: #ff4c4c;
+  animation: textFlash 0.5s infinite alternate;
+}
+
+@keyframes textFlash {
+  0% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+
+.evac-instructions {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.alert-details-box {
+  background-color: #222;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  font-size: 1.2rem;
+}
+
+.dismiss-btn {
+  background-color: white;
+  color: #ff0000;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.dismiss-btn:hover {
+  background-color: #dddddd;
+  transform: scale(1.05);
+}

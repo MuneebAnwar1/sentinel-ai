@@ -1,0 +1,23 @@
+[
+  {
+    "id": "hz-001",
+    "type": "Severe Flooding",
+    "color": "red",
+    "center": [26.0, 68.5], 
+    "radius": 120000 
+  },
+  {
+    "id": "hz-002",
+    "type": "Heavy Rainfall",
+    "color": "blue",
+    "center": [31.5204, 74.3587], 
+    "radius": 80000 
+  },
+  {
+    "id": "hz-003",
+    "type": "Earthquake Aftershocks",
+    "color": "orange",
+    "center": [34.0151, 71.5249], 
+    "radius": 60000 
+  }
+]
