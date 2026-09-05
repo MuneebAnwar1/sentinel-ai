@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
-const Navbar = ({ userRole, onSimulateAlert }) => {
+const Navbar = ({ userRole, setUserRole, onSimulateAlert }) => {
   const navigate = useNavigate();
 
   const getRoleBadge = () => {
@@ -11,12 +11,23 @@ const Navbar = ({ userRole, onSimulateAlert }) => {
         return { label: 'Admin (NDMA)', color: '#ff4c4c' };
       case 'relief':
         return { label: 'Relief Agency / NGO', color: '#4da6ff' };
+      case 'citizen':
+        return { label: 'Registered Citizen', color: '#2ecc71' };
       default:
-        return { label: 'Citizen', color: '#2ecc71' };
+        return { label: 'Guest', color: '#95a5a6' }; // Clean grey for guests
     }
   };
 
   const badge = getRoleBadge();
+
+  const handleAuthAction = () => {
+    if (userRole === 'guest') {
+      navigate('/login'); // Send guests to the login page
+    } else {
+      setUserRole('guest'); // Log out the user by resetting to guest
+      navigate('/dashboard'); // Keep them on the map after exiting
+    }
+  };
 
   return (
     <nav className="sentinel-navbar">
@@ -52,8 +63,12 @@ const Navbar = ({ userRole, onSimulateAlert }) => {
           ● {badge.label}
         </div>
 
-        <button className="logout-btn" onClick={() => navigate('/')}>
-          Exit
+        <button 
+          className="logout-btn" 
+          onClick={handleAuthAction}
+          style={userRole === 'guest' ? { backgroundColor: '#3498db', color: 'white', border: 'none', fontWeight: 'bold' } : {}}
+        >
+          {userRole === 'guest' ? 'Login / Register' : 'Exit'}
         </button>
       </div>
     </nav>

@@ -35,7 +35,8 @@ function MainDashboard({ userRole, isEmergencyActive, setIsEmergencyActive, sosR
 }
 
 function App() {
-  const [userRole, setUserRole] = useState('citizen');
+  // START AS A GUEST BY DEFAULT (Frictionless UX)
+  const [userRole, setUserRole] = useState('guest'); 
   const [isEmergencyActive, setIsEmergencyActive] = useState(false);
   const [sosRequests, setSosRequests] = useState([]);
   const [showToast, setShowToast] = useState(false);
@@ -73,7 +74,11 @@ function App() {
         )}
 
         <Routes>
-          <Route path="/" element={<WelcomeScreen setUserRole={setUserRole} />} />
+          {/* Default Route Now Goes Straight to Dashboard */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          
+          {/* WelcomeScreen is now a dedicated Login/Register page */}
+          <Route path="/login" element={<WelcomeScreen setUserRole={setUserRole} />} />
 
           <Route
             path="/*"
@@ -81,6 +86,7 @@ function App() {
               <>
                 <Navbar 
                   userRole={userRole} 
+                  setUserRole={setUserRole} // Passed so Navbar can handle Logout/Login routing
                   onSimulateAlert={triggerSystemAlert} 
                 />
                 <Routes>

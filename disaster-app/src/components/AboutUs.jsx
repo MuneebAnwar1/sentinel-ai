@@ -1,22 +1,38 @@
 import React from 'react';
-import './AlertScreen.css';
 
 const AboutUs = () => {
   return (
-    <div className="alert-container">
-      <h2 className="alert-header">About SENTINEL AI</h2>
-      <div style={{ backgroundColor: '#1e1e1e', padding: '30px', borderRadius: '10px', maxWidth: '800px', lineHeight: '1.8', color: '#ddd' }}>
-        <h3 style={{ color: '#ff4c4c', marginTop: 0 }}>Mission & Scope</h3>
-        <p>
-          <strong>SENTINEL AI</strong> is an intelligent disaster early-warning and humanitarian relief framework designed to bridge the critical information gap during national climate emergencies, severe floods, and seismic events in Pakistan.
-        </p>
+    <div style={{ minHeight: '100vh', backgroundColor: '#121212', color: '#fff', padding: '60px 20px', fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif' }}>
+      
+      <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: '#1e1e1e', padding: '40px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.8)' }}>
         
-        <h3 style={{ color: '#4da6ff', marginTop: '25px' }}>Three-Tier Stakeholder Integration</h3>
-        <ul style={{ paddingLeft: '20px' }}>
-          <li><strong>Citizens:</strong> Receive automated GIS elevation analysis, local weather alerts, emergency siren triggers, and guidance to nearest high-ground shelters.</li>
-          <li><strong>Relief Associations & NGOs:</strong> Gain instant situational awareness of high-risk sectors to coordinate supply drops, boat rescue dispatches, and medical logistics.</li>
-          <li><strong>Disaster Management Authorities (Admin):</strong> Monitor national risk vectors in real time and issue priority emergency overrides.</li>
+        <h1 style={{ fontSize: '2.5rem', color: '#4da6ff', marginBottom: '20px', textAlign: 'center', textShadow: '0 0 20px rgba(77, 166, 255, 0.3)' }}>
+          About SENTINEL AI
+        </h1>
+        
+        <h3 style={{ color: '#2ecc71', borderBottom: '1px solid #333', paddingBottom: '10px', marginTop: '30px' }}>
+          The Core Problem
+        </h3>
+        <p style={{ color: '#ccc', lineHeight: '1.8', fontSize: '1.1rem' }}>
+          Traditional disaster management is entirely reactive. Government agencies and relief organizations typically deploy resources <em>after</em> the devastation has occurred. During the critical early hours of a climate crisis, communication networks fail, data becomes disorganized, and citizens are left without hyper-local, immediate danger awareness.
+        </p>
+
+        <h3 style={{ color: '#2ecc71', borderBottom: '1px solid #333', paddingBottom: '10px', marginTop: '30px' }}>
+          Our Mission
+        </h3>
+        <p style={{ color: '#ccc', lineHeight: '1.8', fontSize: '1.1rem' }}>
+          SENTINEL AI bridges the critical gap between predictive data science and ground-level rescue coordination. We built a proactive, full-stack disaster management system that predicts extreme weather events before they strike. By combining a 17-feature machine learning model with real-time Geographic Information Systems (GIS), we provide actionable, visual threat data to the people who need it most.
+        </p>
+
+        <h3 style={{ color: '#2ecc71', borderBottom: '1px solid #333', paddingBottom: '10px', marginTop: '30px' }}>
+          System Capabilities
+        </h3>
+        <ul style={{ color: '#ccc', lineHeight: '1.8', fontSize: '1.1rem', paddingLeft: '20px' }}>
+          <li><strong>Proactive Intelligence:</strong> Live API weather telemetry fed directly into an optimized XGBoost classification engine.</li>
+          <li><strong>Verified Rescue Pipelines:</strong> A secure platform ensuring only vetted NGOs and NDMA administrators can access and dispatch units to active citizen SOS broadcasts.</li>
+          <li><strong>Dynamic Scalability:</strong> Built on React and FastAPI, the system is designed to handle high traffic and rapid coordinate rendering during nationwide emergencies.</li>
         </ul>
+
       </div>
     </div>
   );
