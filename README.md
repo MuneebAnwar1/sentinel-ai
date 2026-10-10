@@ -1,24 +1,72 @@
-# React + Vite
+# Sentinel AI — Intelligent Disaster Early-Warning & Crisis Management Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sentinel AI is a full-stack disaster management system engineered to predict localized flood risks and coordinate real-time emergency response. By integrating machine learning with live meteorological telemetry, the platform automates hazard zone identification and connects citizens, verified relief NGOs, and administrators through a unified geospatial interface.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Key Features
 
-## React Compiler
+- **Predictive Flood Analytics:** Uses an XGBoost regression model trained on 17 climate variables (via Open-Meteo API) to generate localized flood risk probabilities.
+- **Geospatial Proximity Warnings:** Calculates client-to-hazard proximity in real time using the Haversine formula to issue targeted visual evacuation warnings.
+- **One-Click Citizen SOS:** Allows citizens to bypass authentication and broadcast GPS-tagged SOS requests directly to active responders.
+- **Role-Based Access Control (RBAC):** Dedicated operational dashboards for Citizens, Verified NGOs, and System Administrators.
+- **Crisis Coordination Hub:** Administrative oversight for manual/automated hazard zone scans and relief organization verification workflows.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Tech Stack & Architecture
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+| Layer | Technology | Primary Role |
+| :--- | :--- | :--- |
+| **Frontend** | React 18, Vite, Leaflet.js | Dynamic UI, state management, and geospatial mapping |
+| **Backend** | Python, FastAPI, Uvicorn | REST APIs, authentication, and in-memory session dispatch |
+| **Machine Learning** | XGBoost, Open-Meteo API | Meteorological data ingestion & flood probability scoring |
 
-----------for frontend-----
-cd disaster-app
-npm run dev
+---
 
---------for backend------------
+## System Architecture
+
+```text
+[ Open-Meteo Telemetry API ]
+             │
+             ▼
+[ FastAPI Backend ] ◄──► [ XGBoost ML Pipeline ]
+        │
+   REST Endpoints
+        │
+        ▼
+[ React + Vite Client ] ──► [ Leaflet Geospatial Map ] ──► [ Haversine Proximity Engine ]
+```
+Getting Started
+Prerequisites
+Node.js: v18+ and npm
+
+Python: v3.10+ and pip
+
+Installation & Local Run Guide
+1. Backend Setup (sentinel-backend)
+Open a terminal window and execute:
+```
 cd sentinel-backend
+python -m venv venv
+
+# On Windows:
+venv\Scripts\activate
+# On Linux/macOS:
+# source venv/bin/activate
+
+pip install -r requirements.txt
 python -m uvicorn main:app --reload
+```
+Backend API will run at: http://127.0.0.1:8000
+
+Interactive API Documentation (Swagger): http://127.0.0.1:8000/docs
+
+2. Frontend Setup (disaster-app)
+Open a separate terminal window and execute:
+```
+cd disaster-app
+npm install
+npm run dev
+```
+Client application will run at: http://localhost:5173
