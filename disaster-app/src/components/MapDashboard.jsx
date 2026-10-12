@@ -182,6 +182,9 @@ const MapDashboard = ({ userRole, sosRequests, setSosRequests }) => {
   return (
     <div className="alert-container" style={{ minHeight: 'auto', paddingBottom: '0', position: 'relative' }}>
       
+      {/* NEW: Flashing Red Edges when in danger */}
+      {!safetyStatus.safe && <div className="danger-edge-glow"></div>}
+
       {(userRole === 'citizen' || userRole === 'guest') && (
         <div style={{
           backgroundColor: safetyStatus.safe ? '#2ecc71' : '#e74c3c',
