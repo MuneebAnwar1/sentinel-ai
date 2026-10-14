@@ -3,35 +3,14 @@ import { useNavigate } from 'react-router-dom';
 
 const WelcomeScreen = ({ setUserRole }) => {
   const navigate = useNavigate();
+  const [authMode, setAuthMode] = useState('login'); 
   
-  const [authMode, setAuthMode] = useState('select');
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('citizen'); 
-  const [adminKey, setAdminKey] = useState('');
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email_or_phone: email, password, role })
-      });
-      const data = await response.json();
-      if (data.status === "PENDING") {
-        alert(data.message); 
-        setAuthMode('login');
-      } else {
-        alert("Registration Successful!");
-        setUserRole(data.role);
-        navigate('/dashboard');
-      }
-    } catch (error) {
-      alert("Backend connection failed. Is Uvicorn running?");
-    }
-  };
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('citizen');
+  const [organization, setOrganization] = useState('');
+  const [city, setCity] = useState('Gojra'); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -39,157 +18,122 @@ const WelcomeScreen = ({ setUserRole }) => {
       const response = await fetch('http://127.0.0.1:8000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email_or_phone: email, password })
+        body: JSON.stringify({ email_or_phone: email, password: password })
       });
       const data = await response.json();
+
       if (!response.ok) {
-        alert(data.detail); 
-      } else {
+        alert(`Login Failed: ${data.detail || "Invalid credentials"}`);
+        return;
+      }
+
+      alert(`Welcome back, ${data.name}!`);
+      
+      // NEW: Save user data for the dashboard
+      localStorage.setItem('sentinelUser', JSON.stringify(data)); 
+      
+      setUserRole(data.role);
+      navigate('/dashboard');
+    } catch (error) {
+      alert("Backend connection failed.");
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          name: name, email_or_phone: email, password: password, role: role,
+          organization_name: role === 'relief' ? organization : null,
+          city: role === 'relief' ? city : null 
+        })
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(`Registration Failed: Please fill all required fields correctly.`);
+        return;
+      }
+
+      if (data.status === "PENDING") {
+        alert(data.message); 
+        setAuthMode('login');
+      } else if (data.status === "APPROVED") {
+        alert("Registration Successful!");
+        
+        // NEW: Save user data for the dashboard
+        localStorage.setItem('sentinelUser', JSON.stringify(data));
+        
         setUserRole(data.role);
         navigate('/dashboard');
       }
     } catch (error) {
-      alert("Backend connection failed. Is Uvicorn running?");
+      alert("Backend connection failed.");
     }
   };
 
-  const handleAdminLogin = (e) => {
-    e.preventDefault();
-    if (adminKey === "SENTINEL-2026") {
-      setUserRole('admin');
-      navigate('/dashboard');
-    } else {
-      alert("Invalid Administrator Key.");
-    }
-  };
-
-  const inputStyle = {
-    padding: '14px', 
-    borderRadius: '8px', 
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-    border: '1px solid #555', 
-    color: 'white',
-    fontSize: '1rem',
-    outline: 'none',
-    width: '100%',
-    boxSizing: 'border-box'
-  };
-
-  const buttonStyle = {
-    padding: '15px', 
-    borderRadius: '8px', 
-    border: 'none', 
-    fontWeight: 'bold', 
-    fontSize: '1rem', 
-    cursor: 'pointer', 
-    transition: 'transform 0.2s, boxShadow 0.2s',
-    width: '100%'
+  const handleGuestAccess = () => {
+    localStorage.removeItem('sentinelUser'); // Clear old data for guests
+    setUserRole('guest');
+    navigate('/dashboard');
   };
 
   return (
-    <div style={{
-      minHeight: '100vh', 
-      background: 'radial-gradient(circle at center, #1a1a2e 0%, #121212 100%)', // Sleek dark gradient
-      color: '#fff',
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center',
-      justifyContent: 'center', // Centers vertically on the screen
-      padding: '20px', 
-      fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-    }}>
-      
-      {/* HEADER SECTION */}
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '3.5rem', color: '#4da6ff', margin: '0 0 10px 0', textShadow: '0 0 20px rgba(77, 166, 255, 0.5)', letterSpacing: '2px' }}>
-          🛡️ SENTINEL AI
-        </h1>
-        <p style={{ fontSize: '1.2rem', color: '#aaa', margin: '0' }}>
-          Secure Authorization Portal
-        </p>
-      </div>
+    <div style={{ minHeight: '100vh', backgroundColor: '#121212', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'Arial, sans-serif' }}>
+      <div style={{ backgroundColor: '#1e1e1e', padding: '40px', borderRadius: '12px', width: '100%', maxWidth: '400px', color: 'white', border: '1px solid #333', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <h1 style={{ color: '#e74c3c', margin: '0 0 10px 0', fontSize: '2rem' }}>🛡️ SENTINEL AI</h1>
+          <p style={{ color: '#aaa', margin: 0 }}>Disaster Early-Warning & Relief</p>
+        </div>
 
-      {/* AUTHENTICATION BOX (Glassmorphism Effect) */}
-      <div style={{
-        backgroundColor: 'rgba(30, 30, 35, 0.7)', 
-        backdropFilter: 'blur(10px)',
-        padding: '40px', 
-        borderRadius: '16px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: '0 20px 50px rgba(0,0,0,0.5)', 
-        width: '100%', 
-        maxWidth: '420px',
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: '20px', 
-        zIndex: 10
-      }}>
-        
-        {authMode === 'select' && (
-          <>
-            <button 
-              onClick={() => setAuthMode('login')} 
-              style={{ ...buttonStyle, backgroundColor: '#3498db', color: 'white', boxShadow: '0 4px 15px rgba(52, 152, 219, 0.4)' }}
-            >
-              👤 Citizen / NGO Portal
-            </button>
-            <div style={{ textAlign: 'center', color: '#777', margin: '5px 0', fontSize: '0.9rem', letterSpacing: '1px' }}>— OR —</div>
-            <button 
-              onClick={() => setAuthMode('admin')} 
-              style={{ ...buttonStyle, backgroundColor: '#9b59b6', color: 'white', boxShadow: '0 4px 15px rgba(155, 89, 182, 0.4)' }}
-            >
-              🔐 NDMA Admin Portal
-            </button>
-            
-            <button 
-              onClick={() => navigate('/dashboard')} 
-              style={{ backgroundColor: 'transparent', color: '#aaa', border: 'none', cursor: 'pointer', marginTop: '15px', fontSize: '0.9rem' }}
-            >
-              ← Return to Live Map (Guest View)
-            </button>
-          </>
-        )}
+        <form onSubmit={authMode === 'login' ? handleLogin : handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          {authMode === 'register' && (
+            <>
+              <input type="text" placeholder="Full Name" required value={name} onChange={(e) => setName(e.target.value)} style={{ padding: '12px', borderRadius: '6px', backgroundColor: '#2a2a2a', color: 'white', border: '1px solid #444' }} />
+              <select value={role} onChange={(e) => setRole(e.target.value)} style={{ padding: '12px', borderRadius: '6px', backgroundColor: '#2a2a2a', color: 'white', border: '1px solid #444' }}>
+                <option value="citizen">Citizen (Standard)</option>
+                <option value="relief">NGO / Relief Organization</option>
+              </select>
+              
+              {role === 'relief' && (
+                <>
+                  <input type="text" placeholder="Organization Name" required value={organization} onChange={(e) => setOrganization(e.target.value)} style={{ padding: '12px', borderRadius: '6px', backgroundColor: '#2a2a2a', color: 'white', border: '1px solid #444', boxSizing: 'border-box' }} />
+                  <select value={city} onChange={(e) => setCity(e.target.value)} style={{ padding: '12px', borderRadius: '6px', backgroundColor: '#2a2a2a', color: 'white', border: '1px solid #444', boxSizing: 'border-box' }}>
+                    <option value="Gojra">Gojra</option>
+                    <option value="Dadu">Dadu (Sindh - Flood Zone)</option>
+                    <option value="Lahore">Lahore</option>
+                    <option value="Karachi">Karachi</option>
+                    <option value="Islamabad">Islamabad</option>
+                    <option value="Peshawar">Peshawar</option>
+                    <option value="Multan">Multan</option>
+                  </select>
+                </>
+              )}
+            </>
+          )}
 
-        {authMode === 'login' && (
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <h3 style={{ margin: '0 0 10px 0', textAlign: 'center', color: '#3498db', fontSize: '1.5rem' }}>Account Login</h3>
-            <input type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required style={inputStyle} />
-            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required style={inputStyle} />
-            <button type="submit" style={{ ...buttonStyle, backgroundColor: '#3498db', color: 'white', marginTop: '10px' }}>Login</button>
-            <p style={{ textAlign: 'center', fontSize: '0.95rem', color: '#aaa', marginTop: '10px', marginBottom: '0' }}>
-              Don't have an account? <span style={{ color: '#3498db', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setAuthMode('register')}>Register</span>
-            </p>
-            <button type="button" onClick={() => setAuthMode('select')} style={{ backgroundColor: 'transparent', color: '#aaa', border: 'none', cursor: 'pointer', marginTop: '15px' }}>← Back to Selection</button>
-          </form>
-        )}
+          <input type="text" placeholder="Email or Phone Number" required value={email} onChange={(e) => setEmail(e.target.value)} style={{ padding: '12px', borderRadius: '6px', backgroundColor: '#2a2a2a', color: 'white', border: '1px solid #444' }} />
+          <input type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: '12px', borderRadius: '6px', backgroundColor: '#2a2a2a', color: 'white', border: '1px solid #444' }} />
 
-        {authMode === 'register' && (
-          <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <h3 style={{ margin: '0 0 10px 0', textAlign: 'center', color: '#2ecc71', fontSize: '1.5rem' }}>Create Account</h3>
-            <input type="text" placeholder="Full Name / NGO Name" value={name} onChange={(e) => setName(e.target.value)} required style={inputStyle} />
-            <input type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required style={inputStyle} />
-            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required style={inputStyle} />
-            <select value={role} onChange={(e) => setRole(e.target.value)} style={inputStyle}>
-              <option value="citizen">Standard User (Citizen)</option>
-              <option value="relief">Relief NGO / First Responder</option>
-            </select>
-            <button type="submit" style={{ ...buttonStyle, backgroundColor: '#2ecc71', color: 'white', marginTop: '10px' }}>Register</button>
-            <p style={{ textAlign: 'center', fontSize: '0.95rem', color: '#aaa', marginTop: '10px', marginBottom: '0' }}>
-              Already registered? <span style={{ color: '#2ecc71', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setAuthMode('login')}>Login</span>
-            </p>
-            <button type="button" onClick={() => setAuthMode('select')} style={{ backgroundColor: 'transparent', color: '#aaa', border: 'none', cursor: 'pointer', marginTop: '15px' }}>← Back to Selection</button>
-          </form>
-        )}
+          <button type="submit" style={{ padding: '14px', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '10px' }}>
+            {authMode === 'login' ? 'Secure Login' : 'Register Account'}
+          </button>
+        </form>
 
-        {authMode === 'admin' && (
-          <form onSubmit={handleAdminLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <h3 style={{ margin: '0 0 5px 0', textAlign: 'center', color: '#9b59b6', fontSize: '1.5rem' }}>Admin Authorization</h3>
-            <p style={{ fontSize: '0.9rem', color: '#aaa', textAlign: 'center', margin: '0 0 15px 0' }}>Enter your encrypted government clearance key.</p>
-            <input type="password" placeholder="SENTINEL-XXXX" value={adminKey} onChange={(e) => setAdminKey(e.target.value)} required style={{ ...inputStyle, textAlign: 'center', letterSpacing: '3px', fontSize: '1.1rem' }} />
-            <button type="submit" style={{ ...buttonStyle, backgroundColor: '#9b59b6', color: 'white', marginTop: '10px' }}>Authorize Access</button>
-            <button type="button" onClick={() => setAuthMode('select')} style={{ backgroundColor: 'transparent', color: '#aaa', border: 'none', cursor: 'pointer', marginTop: '15px' }}>← Back to Selection</button>
-          </form>
-        )}
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <button type="button" onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')} style={{ background: 'none', border: 'none', color: '#aaa', textDecoration: 'underline', cursor: 'pointer' }}>
+            {authMode === 'login' ? "Need an account? Register here" : "Already have an account? Login"}
+          </button>
+        </div>
+
+        <hr style={{ borderColor: '#333', margin: '25px 0' }} />
+
+        <button type="button" onClick={handleGuestAccess} style={{ width: '100%', padding: '12px', backgroundColor: '#2ecc71', color: '#121212', border: 'none', borderRadius: '6px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
+          🌐 Continue as Guest
+        </button>
       </div>
     </div>
   );

@@ -1,109 +1,91 @@
 import React, { useState } from 'react';
 
-const ReportDisasterModal = ({ isOpen, onClose, onSubmit, userLocation }) => {
-  const [incidentType, setIncidentType] = useState('Flood');
-  const [severity, setSeverity] = useState('Low');
-  const [description, setDescription] = useState('');
+const ReportDisasterModal = ({ isOpen, onClose, userLocation, cityName, localProviders, onSubmit }) => {
+  const [emergencyType, setEmergencyType] = useState('Flood');
+  const [peopleCount, setPeopleCount] = useState(1);
+  const [selectedProvider, setSelectedProvider] = useState('auto');
 
-  // If the modal isn't supposed to be open, don't render anything
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Create the payload exactly how your backend teammate will want it
+    // Find the name of the selected provider for the success message
+    const providerName = selectedProvider === 'auto' 
+      ? 'Auto-Route to Nearest' 
+      : localProviders.find(p => p.id.toString() === selectedProvider)?.name || 'Unknown';
+
     const payload = {
-      id: `REP-${Date.now().toString().slice(-4)}`,
-      type: incidentType,
-      severity: severity,
-      description: description,
-      lat: userLocation ? userLocation[0] : null,
-      lng: userLocation ? userLocation[1] : null,
-      status: 'UNDER_REVIEW',
-      timestamp: new Date().toLocaleTimeString()
+      lat: userLocation[0],
+      lng: userLocation[1],
+      emergency_type: emergencyType,
+      people_count: parseInt(peopleCount),
+      city: cityName,
+      provider_id: selectedProvider === 'auto' ? null : parseInt(selectedProvider),
+      target_provider_name: providerName
     };
 
-    onSubmit(payload);
-    
-    // Reset form and close
-    setIncidentType('Flood');
-    setSeverity('Low');
-    setDescription('');
-    onClose();
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/reports/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      onSubmit(data.message);
+      onClose();
+    } catch (error) {
+      alert("Failed to submit report. Please check backend connection.");
+    }
   };
 
   return (
     <div style={{
-      position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', justifyContent: 'center',
-      alignItems: 'center', zIndex: 9999
+      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+      backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex',
+      justifyContent: 'center', alignItems: 'center'
     }}>
       <div style={{
         backgroundColor: '#1e1e1e', padding: '30px', borderRadius: '12px',
-        width: '90%', maxWidth: '450px', border: '1px solid #333', color: '#fff',
-        boxShadow: '0 15px 30px rgba(0,0,0,0.6)'
+        width: '100%', maxWidth: '450px', color: 'white', border: '1px solid #444',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.8)'
       }}>
-        <h3 style={{ marginTop: 0, color: '#4da6ff', borderBottom: '1px solid #444', paddingBottom: '10px' }}>
-          📢 Report Non-SOS Incident
-        </h3>
+        <h2 style={{ marginTop: 0, color: '#e74c3c', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
+          📢 Report Local Incident
+        </h2>
         
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
+          
           <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#aaa' }}>Incident Type</label>
-            <select 
-              value={incidentType} 
-              onChange={(e) => setIncidentType(e.target.value)}
-              style={{ width: '100%', padding: '10px', borderRadius: '6px', backgroundColor: '#121212', color: '#fff', border: '1px solid #444' }}
-            >
-              <option value="Flood">Flood / Rising Water</option>
-              <option value="Heavy Rain">Heavy Rain</option>
-              <option value="Blocked Road">Blocked Road</option>
-              <option value="Fallen Powerline">Fallen Powerline</option>
-              <option value="Other">Other</option>
+            <label style={{ display: 'block', marginBottom: '5px', color: '#aaa' }}>Current City Zone:</label>
+            <input type="text" value={cityName} disabled style={{ width: '100%', padding: '10px', borderRadius: '4px', backgroundColor: '#2a2a2a', color: '#4da6ff', border: '1px solid #444', fontWeight: 'bold', boxSizing: 'border-box' }} />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', marginBottom: '5px', color: '#aaa' }}>Target Specific NGO/Hospital:</label>
+            <select value={selectedProvider} onChange={(e) => setSelectedProvider(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '4px', backgroundColor: '#333', color: 'white', border: '1px solid #555', boxSizing: 'border-box' }}>
+              <option value="auto">⚡ Auto-Route to Nearest Available</option>
+              {localProviders.map(provider => (
+                <option key={provider.id} value={provider.id}>
+                  {provider.name} ({provider.type})
+                </option>
+              ))}
             </select>
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#aaa' }}>Severity</label>
-            <select 
-              value={severity} 
-              onChange={(e) => setSeverity(e.target.value)}
-              style={{ width: '100%', padding: '10px', borderRadius: '6px', backgroundColor: '#121212', color: '#fff', border: '1px solid #444' }}
-            >
-              <option value="Low">Low (Monitor situation)</option>
-              <option value="Medium">Medium (Affecting movement)</option>
-              <option value="High">High (Immediate threat)</option>
+            <label style={{ display: 'block', marginBottom: '5px', color: '#aaa' }}>Emergency Type:</label>
+            <select value={emergencyType} onChange={(e) => setEmergencyType(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '4px', backgroundColor: '#333', color: 'white', border: '1px solid #555', boxSizing: 'border-box' }}>
+              <option value="Flood">Severe Flooding</option>
+              <option value="Medical">Medical Emergency</option>
+              <option value="Structural">Collapsed Structure</option>
+              <option value="Fire">Fire / Explosion</option>
             </select>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#aaa' }}>Description</label>
-            <textarea 
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide details (e.g., water level rising fast near main bridge)..."
-              rows="3"
-              style={{ width: '100%', padding: '10px', borderRadius: '6px', backgroundColor: '#121212', color: '#fff', border: '1px solid #444', resize: 'none' }}
-              required
-            />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', color: '#aaa' }}>Attach Image (Optional)</label>
-            <input 
-              type="file" 
-              accept="image/*"
-              style={{ width: '100%', fontSize: '0.9rem', color: '#aaa' }}
-            />
           </div>
 
           <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-            <button type="button" onClick={onClose} style={{ flex: 1, padding: '12px', backgroundColor: 'transparent', border: '1px solid #555', color: '#aaa', borderRadius: '6px', cursor: 'pointer' }}>
-              Cancel
-            </button>
-            <button type="submit" style={{ flex: 2, padding: '12px', backgroundColor: '#4da6ff', border: 'none', color: '#fff', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
-              Submit Report
-            </button>
+            <button type="button" onClick={onClose} style={{ flex: 1, padding: '12px', backgroundColor: '#555', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Cancel</button>
+            <button type="submit" style={{ flex: 1, padding: '12px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Submit Report</button>
           </div>
         </form>
       </div>

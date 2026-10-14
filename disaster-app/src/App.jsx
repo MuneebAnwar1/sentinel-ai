@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import WelcomeScreen from './components/WelcomeScreen';
 import Navbar from './components/Navbar';
-import AlertScreen from './components/AlertScreen';
 import MapDashboard from './components/MapDashboard';
 import RedAlertOverlay from './components/RedAlertOverlay';
 import AIModelDetails from './components/AIModelDetails';
@@ -29,7 +28,7 @@ function MainDashboard({ userRole, isEmergencyActive, setIsEmergencyActive, sosR
         sosRequests={sosRequests} 
         setSosRequests={setSosRequests}
       />
-      <AlertScreen />
+      
     </div>
   );
 }
